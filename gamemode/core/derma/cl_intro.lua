@@ -48,6 +48,28 @@ function PANEL:Think()
 end
 
 function PANEL:BeginIntro()
+	-- something could have errored on startup and invalidated all options, so we'll be extra careful with setting the option
+	-- because if it errors here, the sound will play each tick and proceed to hurt ears
+	local bLoaded = false
+
+	if (ix and ix.option and ix.option.Set) then
+		local bSuccess, _ = pcall(ix.option.Set, "showIntro", false)
+		bLoaded = bSuccess
+	end
+
+	if (!bLoaded) then
+		self:Remove()
+
+		if (ix and ix.gui and IsValid(ix.gui.characterMenu)) then
+			ix.gui.characterMenu:Remove()
+		end
+
+		ErrorNoHalt(
+			"[Helix] Something has errored and prevented the framework from loading correctly - check your console for errors!\n")
+
+		return
+	end
+
 	self:MoveToFront()
 	self:RequestFocus()
 
@@ -63,8 +85,6 @@ function PANEL:BeginIntro()
 			end)
 		end)
 	end)
-
-	ix.option.Set("showIntro", false)
 end
 
 function PANEL:AnimateWaves(target, bReverse)
@@ -180,7 +200,7 @@ function PANEL:Paint(width, height)
 
 	-- background
 	if (self.bBackground) then
-		surface.SetDrawColor(Color(0, 0, 0, 255))
+		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(0, 0, width, height)
 	end
 
@@ -201,7 +221,7 @@ function PANEL:Paint(width, height)
 		local ratio = i / #self.waves
 		local color = ratio * 33
 
-		surface.SetDrawColor(Color(color, color, color, self.bBackground and 255 or ratio * 320))
+		surface.SetDrawColor(color, color, color, self.bBackground and 255 or ratio * 320)
 		self:PaintCurve(height * wave[1], width, wave[2])
 	end
 
@@ -216,9 +236,9 @@ function PANEL:Paint(width, height)
 	end
 
 	-- title text glow
-	surface.SetTextColor(Color(255, 255, 255,
+	surface.SetTextColor(255, 255, 255,
 		self.sunbeamOffset == 1 and self.kickTarget or math.sin(math.pi * self.sunbeamOffset) * 255
-	))
+	)
 	surface.SetFont("ixIntroTitleBlurFont")
 
 	local logoTextWidth, logoTextHeight = surface.GetTextSize(text)
@@ -226,7 +246,7 @@ function PANEL:Paint(width, height)
 	surface.DrawText(text)
 
 	-- title text
-	surface.SetTextColor(Color(255, 255, 255, self.sunbeamOffset * 255))
+	surface.SetTextColor(255, 255, 255, self.sunbeamOffset * 255)
 	surface.SetFont("ixIntroTitleFont")
 
 	logoTextWidth, logoTextHeight = surface.GetTextSize(text)
@@ -238,7 +258,7 @@ function PANEL:Paint(width, height)
 	text = L("introTextOne"):lower()
 	textWidth = surface.GetTextSize(text)
 
-	surface.SetTextColor(Color(255, 255, 255, self.textOne * 255))
+	surface.SetTextColor(255, 255, 255, self.textOne * 255)
 	surface.SetTextPos(width * 0.5 - textWidth * 0.5, height * 0.66)
 	surface.DrawText(text)
 
@@ -246,7 +266,7 @@ function PANEL:Paint(width, height)
 	text = L("introTextTwo", Schema.author or "nebulous"):lower()
 	textWidth = surface.GetTextSize(text)
 
-	surface.SetTextColor(Color(255, 255, 255, self.textTwo * 255))
+	surface.SetTextColor(255, 255, 255, self.textTwo * 255)
 	surface.SetTextPos(width * 0.5 - textWidth * 0.5, height * 0.66)
 	surface.DrawText(text)
 
@@ -263,7 +283,7 @@ function PANEL:Paint(width, height)
 		end
 	end
 
-	surface.SetTextColor(Color(255, 255, 255, self.continueText * 255 - (math.sin(self.pulse) * 100), 0))
+	surface.SetTextColor(255, 255, 255, self.continueText * 255 - (math.sin(self.pulse) * 100), 0)
 	surface.SetTextPos(width * 0.5 - textWidth * 0.5, centerY * 2 - textHeight * 2)
 	surface.DrawText(text)
 

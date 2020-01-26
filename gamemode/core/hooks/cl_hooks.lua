@@ -216,14 +216,14 @@ function GM:LoadFonts(font, genericFont)
 
 	surface.CreateFont("ixIntroTitleFont", {
 		font = font,
-		size = ScreenScale(128),
+		size = math.min(ScreenScale(128), 128),
 		extended = true,
 		weight = 100
 	})
 
 	surface.CreateFont("ixIntroTitleBlurFont", {
 		font = font,
-		size = ScreenScale(128),
+		size = math.min(ScreenScale(128), 128),
 		extended = true,
 		weight = 100,
 		blursize = 4
@@ -525,7 +525,15 @@ do
 				end
 
 				local infoPanel = vgui.Create(ix.option.Get("minimalTooltips", false) and "ixTooltipMinimal" or "ixTooltip")
-				infoPanel:SetEntity(lastEntity)
+				local entityPlayer = lastEntity:GetNetVar("player")
+
+				if (entityPlayer) then
+					infoPanel:SetEntity(entityPlayer)
+					infoPanel.entity = lastEntity
+				else
+					infoPanel:SetEntity(lastEntity)
+				end
+
 				infoPanel:SetDrawArrow(true)
 				ix.gui.entityInfo = infoPanel
 			end
@@ -799,6 +807,7 @@ hidden["CHudCrosshair"] = true
 hidden["CHudHistoryResource"] = true
 hidden["CHudPoisonDamageIndicator"] = true
 hidden["CHudSquadStatus"] = true
+hidden["CHUDQuickInfo"] = true
 
 function GM:HUDShouldDraw(element)
 	if (hidden[element]) then

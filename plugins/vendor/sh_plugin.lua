@@ -1,9 +1,6 @@
 
---[[
-	luacheck: globals
-	VENDOR_BUY VENDOR_SELL VENDOR_BOTH VENDOR_WELCOME VENDOR_LEAVE VENDOR_NOTRADE VENDOR_PRICE VENDOR_STOCK VENDOR_MODE
-	VENDOR_MAXSTOCK VENDOR_SELLANDBUY VENDOR_SELLONLY VENDOR_BUYONLY VENDOR_TEXT
-]]
+-- luacheck: globals VENDOR_BUY VENDOR_SELL VENDOR_BOTH VENDOR_WELCOME VENDOR_LEAVE VENDOR_NOTRADE VENDOR_PRICE
+-- luacheck: globals VENDOR_STOCK VENDOR_MODE VENDOR_MAXSTOCK VENDOR_SELLANDBUY VENDOR_SELLONLY VENDOR_BUYONLY VENDOR_TEXT
 
 local PLUGIN = PLUGIN
 
@@ -524,9 +521,9 @@ else
 		local data = net.ReadType()
 
 		if (key == "name") then
-			editor.name:SetText(entity:GetDisplayName())
+			editor.name:SetText(data)
 		elseif (key == "description") then
-			editor.description:SetText(entity:GetDescription())
+			editor.description:SetText(data)
 		elseif (key == "bubble") then
 			editor.bubble.noSend = true
 			editor.bubble:SetValue(data and 1 or 0)

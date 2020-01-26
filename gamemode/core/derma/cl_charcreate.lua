@@ -9,6 +9,7 @@ function PANEL:Init()
 	local parent = self:GetParent()
 	local halfWidth = parent:GetWide() * 0.5 - (padding * 2)
 	local halfHeight = parent:GetTall() * 0.5 - (padding * 2)
+	local modelFOV = (ScrW() > ScrH() * 1.8) and 100 or 78
 
 	self:ResetPayload(true)
 
@@ -43,15 +44,16 @@ function PANEL:Init()
 	self.factionModel = modelList:Add("ixModelPanel")
 	self.factionModel:Dock(FILL)
 	self.factionModel:SetModel("models/error.mdl")
-	self.factionModel:SetFOV(78)
+	self.factionModel:SetFOV(modelFOV)
 	self.factionModel.PaintModel = self.factionModel.Paint
 
 	self.factionButtonsPanel = self.factionPanel:Add("ixCharMenuButtonList")
 	self.factionButtonsPanel:SetWide(halfWidth)
-	self.factionButtonsPanel:Dock(LEFT)
+	self.factionButtonsPanel:Dock(FILL)
 
-	local factionBack = self.factionButtonsPanel:Add("ixMenuButton")
+	local factionBack = self.factionPanel:Add("ixMenuButton")
 	factionBack:SetText("return")
+	factionBack:Dock(BOTTOM)
 	factionBack.DoClick = function()
 		self.progress:DecrementProgress()
 
@@ -86,7 +88,7 @@ function PANEL:Init()
 	self.descriptionModel = descriptionModelList:Add("ixModelPanel")
 	self.descriptionModel:Dock(FILL)
 	self.descriptionModel:SetModel(self.factionModel:GetModel())
-	self.descriptionModel:SetFOV(65)
+	self.descriptionModel:SetFOV(modelFOV - 13)
 	self.descriptionModel.PaintModel = self.descriptionModel.Paint
 
 	self.descriptionPanel = self.description:Add("Panel")
@@ -130,7 +132,7 @@ function PANEL:Init()
 	self.attributesModel = attributesModelList:Add("ixModelPanel")
 	self.attributesModel:Dock(FILL)
 	self.attributesModel:SetModel(self.factionModel:GetModel())
-	self.attributesModel:SetFOV(65)
+	self.attributesModel:SetFOV(modelFOV - 13)
 	self.attributesModel.PaintModel = self.attributesModel.Paint
 
 	self.attributesPanel = self.attributes:Add("Panel")
@@ -342,7 +344,6 @@ function PANEL:Populate()
 				local button = self.factionButtonsPanel:Add("ixMenuSelectionButton")
 				button:SetBackgroundColor(v.color or color_white)
 				button:SetText(L(v.name):upper())
-				button:Dock(BOTTOM)
 				button:SetButtonList(self.factionButtons)
 				button.faction = v.index
 				button.OnSelected = function(panel)
@@ -376,6 +377,8 @@ function PANEL:Populate()
 			end
 		end
 	end
+
+	self.factionButtonsPanel:SizeToContents()
 
 	local zPos = 1
 
